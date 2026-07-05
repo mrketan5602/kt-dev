@@ -4,9 +4,19 @@ export default function ResultCard({
   totalPoints,
   sgpa,
 }) {
+  const score = Number(sgpa);
+
+  let remark = "Needs Improvement";
+
+  if (score >= 9) remark = "🏆 Outstanding";
+  else if (score >= 8) remark = "🌟 Excellent";
+  else if (score >= 7) remark = "👍 Very Good";
+  else if (score >= 6) remark = "🙂 Good";
+
   return (
-    <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-6 shadow-lg">
-      <h2 className="mb-6 text-2xl font-bold text-white">
+    <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-6 shadow-lg sticky top-24">
+
+      <h2 className="mb-6 text-2xl font-bold">
         📊 Result Summary
       </h2>
 
@@ -29,9 +39,9 @@ export default function ResultCard({
 
       </div>
 
-      <div className="mt-8 rounded-xl bg-indigo-600/10 p-6 text-center border border-indigo-500/20">
+      <div className="mt-8 rounded-xl border border-indigo-500/20 bg-indigo-600/10 p-6 text-center">
 
-        <p className="text-zinc-400 uppercase tracking-widest text-sm">
+        <p className="text-sm uppercase tracking-widest text-zinc-400">
           SGPA
         </p>
 
@@ -39,7 +49,12 @@ export default function ResultCard({
           {sgpa}
         </h1>
 
+        <p className="mt-3 text-lg text-zinc-300">
+          {remark}
+        </p>
+
       </div>
+
     </div>
   );
 }
