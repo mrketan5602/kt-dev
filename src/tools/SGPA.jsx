@@ -1,7 +1,11 @@
 import { useState } from "react";
+
+import SubjectRow from "../components/sgpa/SubjectRow";
+import ResultCard from "../components/sgpa/ResultCard";
 import { gradePoints } from "../lib/gradePoints";
 
 const createSubject = () => ({
+  name: "",
   credits: 4,
   grade: "O",
 });
@@ -22,93 +26,87 @@ export default function SGPA() {
   };
 
   const removeSubject = (index) => {
-    if (subjects.length <= 1) return;
+    if (subjects.length === 1) return;
+
     setSubjects(subjects.filter((_, i) => i !== index));
   };
 
+  const resetCalculator = () => {
+    setSubjects(Array.from({ length: 6 }, createSubject));
+  };
+
+  const totalSubjects = subjects.length;
+
   const totalCredits = subjects.reduce(
-    (sum, s) => sum + Number(s.credits),
+    (sum, subject) => sum + Number(subject.credits || 0),
     0
   );
 
-  const earnedPoints = subjects.reduce(
-    (sum, s) => sum + Number(s.credits) * gradePoints[s.grade],
+  const totalPoints = subjects.reduce(
+    (sum, subject) =>
+      sum + Number(subject.credits || 0) * gradePoints[subject.grade],
     0
   );
 
   const sgpa =
-    totalCredits > 0 ? (earnedPoints / totalCredits).toFixed(2) : "0.00";
+    totalCredits > 0
+      ? (totalPoints / totalCredits).toFixed(2)
+      : "0.00";
 
   return (
-    <div className="max-w-3xl mx-auto">
+    <main className="min-h-screen bg-zinc-950 px-6 py-12 text-white">
 
-      <h2 className="text-3xl font-bold mb-8">
-        SGPA Calculator
-      </h2>
+      <div className="mx-auto max-w-5xl">
 
-      <div className="space-y-4">
-
-        {subjects.map((subject, index) => (
-          <div
-            key={index}
-            className="grid grid-cols-3 gap-4 bg-zinc-800 p-4 rounded-xl"
-          >
-
-            <input
-              type="number"
-              min="1"
-              value={subject.credits}
-              onChange={(e) =>
-                updateSubject(index, "credits", e.target.value)
-              }
-              className="rounded-lg bg-zinc-900 p-3 outline-none"
-            />
-
-            <select
-              value={subject.grade}
-              onChange={(e) =>
-                updateSubject(index, "grade", e.target.value)
-              }
-              className="rounded-lg bg-zinc-900 p-3"
-            >
-              {Object.keys(gradePoints).map((grade) => (
-                <option key={grade}>{grade}</option>
-              ))}
-            </select>
-
-            <button
-              onClick={() => removeSubject(index)}
-              className="rounded-lg bg-red-600 hover:bg-red-500"
-            >
-              Remove
-            </button>
-
-          </div>
-        ))}
-
-      </div>
-
-      <button
-        onClick={addSubject}
-        className="mt-6 rounded-xl bg-indigo-600 px-6 py-3 hover:bg-indigo-500"
-      >
-        + Add Subject
-      </button>
-
-      <div className="mt-10 rounded-xl border border-zinc-700 bg-zinc-900 p-6">
-
-        <p className="text-zinc-400">Total Credits</p>
-        <h3 className="text-3xl font-bold">
-          {totalCredits}
-        </h3>
-
-        <p className="mt-6 text-zinc-400">Your SGPA</p>
-        <h1 className="text-6xl font-extrabold text-indigo-400">
-          {sgpa}
+        <h1 className="text-4xl font-bold">
+          🎓 SGPA Calculator
         </h1>
 
+        <p className="mt-2 text-zinc-400">
+          Calculate your Semester Grade Point Average instantly.
+        </p>
+
+        <div className="mt-10 space-y-6">
+
+          {subjects.map((subject, index) => (
+            <SubjectRow
+              key={index}
+              subject={subject}
+              index={index}
+              onChange={updateSubject}
+              onRemove={removeSubject}
+            />
+          ))}
+
+        </div>
+
+        <div className="mt-8 flex flex-wrap gap-4">
+
+          <button
+            onClick={addSubject}
+            className="rounded-xl bg-indigo-600 px-6 py-3 font-medium transition hover:bg-indigo-500"
+          >
+            + Add Subject
+          </button>
+
+          <button
+            onClick={resetCalculator}
+            className="rounded-xl border border-zinc-700 px-6 py-3 transition hover:bg-zinc-900"
+          >
+            Reset
+          </button>
+
+        </div>
+
+        <ResultCard
+          totalSubjects={totalSubjects}
+          totalCredits={totalCredits}
+          totalPoints={totalPoints}
+          sgpa={sgpa}
+        />
+
       </div>
 
-    </div>
+    </main>
   );
 }
